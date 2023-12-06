@@ -148,9 +148,9 @@ public enum OAuth2Error: Error, CustomStringConvertible, Equatable {
 	/// Scope was invalid. Passes the underlying error_description.
 	case invalidScope(String?)
 	
-	/// A 500 was thrown.
-	case serverError
-	
+	/// A 500 was thrown, or the OAuth provider reports non-500 errors using this key
+	case serverError(String?)
+
 	/// The service is temporarily unavailable. Passes the underlying error_description.
 	case temporarilyUnavailable(String?)
 
@@ -182,7 +182,7 @@ public enum OAuth2Error: Error, CustomStringConvertible, Equatable {
 		case "invalid_scope":
 			return .invalidScope(description)
 		case "server_error":
-			return .serverError
+			return .serverError(description)
 		case "temporarily_unavailable":
 			return .temporarilyUnavailable(description)
 		case "invalid_grant":
@@ -271,8 +271,8 @@ public enum OAuth2Error: Error, CustomStringConvertible, Equatable {
 			return message ?? "The authorization server does not support obtaining an access token using this method."
 		case .invalidScope(let message):
 			return message ?? "The requested scope is invalid, unknown, or malformed."
-		case .serverError:
-			return "The authorization server encountered an unexpected condition that prevented it from fulfilling the request."
+		case .serverError(let message):
+			return message ?? "The authorization server encountered an unexpected condition that prevented it from fulfilling the request."
 		case .temporarilyUnavailable(let message):
 			return message ?? "The authorization server is currently unable to handle the request due to a temporary overloading or maintenance of the server."
 		case .invalidGrant(let message):
@@ -323,7 +323,7 @@ public enum OAuth2Error: Error, CustomStringConvertible, Equatable {
 		case (.accessDenied(let lhm), .accessDenied(let rhm)):                   return lhm == rhm
 		case (.unsupportedResponseType, .unsupportedResponseType):   return true
 		case (.invalidScope(let lhm), .invalidScope(let rhm)):                   return lhm == rhm
-		case (.serverError, .serverError):                           return true
+		case (.serverError(let lhm), .serverError(let rhm)):                           return lhm == rhm
 		case (.temporarilyUnavailable(let lhm), .temporarilyUnavailable(let rhm)):     return lhm == rhm
 		case (.invalidGrant(let lhm), .invalidGrant(let rhm)):       return lhm == rhm
 		case (.responseError(let lhm), .responseError(let rhm)):     return lhm == rhm
