@@ -81,7 +81,7 @@ open class OAuth2DataLoader: OAuth2Requestable {
 	- parameter callback: The callback to call when the request completes/fails. Looks terrifying, see above on how to use it
 	*/
 	override open func perform(request: URLRequest, callback: @escaping ((OAuth2Response) -> Void)) {
-		perform(request: request, retry: true, callback: callback)
+        perform(request: request, retry: true, callback: callback)
 	}
 	
 	/**
@@ -118,7 +118,9 @@ open class OAuth2DataLoader: OAuth2Requestable {
 					throw OAuth2Error.unauthorizedClient(nil)
 				}
 				let _ = try response.responseData()
-				callback(response)
+                DispatchQueue.main.async {
+                    callback(response)
+                }
 			}
 			
 			// not authorized; stop and enqueue all requests, start authorization once, then re-try all enqueued requests
@@ -138,13 +140,17 @@ open class OAuth2DataLoader: OAuth2Requestable {
 					}
 				}
 				else {
-					callback(response)
+                    DispatchQueue.main.async {
+                        callback(response)
+                    }
 				}
 			}
 			
 			// some other error, pass along
 			catch {
-				callback(response)
+                DispatchQueue.main.async {
+                    callback(response)
+                }
 			}
 		}
 	}
